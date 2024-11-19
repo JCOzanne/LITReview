@@ -21,9 +21,5 @@ class TicketForm(forms.ModelForm):
             'image': 'Image'
         }
 
-class FollowUserForm(forms.ModelForm):
-    follows = forms.CharField(label="Nom d'utilisateur à suivre")
-
-    class Meta:
-        model = models.UserFollows
-        fields = []
+class FollowUserForm(forms.Form):
+    username = forms.CharField(label="Nom d'utilisateur à suivre", max_length=150)

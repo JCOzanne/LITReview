@@ -9,6 +9,18 @@
 
     <h3>Utilisateurs suivis</h3>
     {% for follow in followed_users %}
-        <p>{{ follow.followed_user.username }}</p>
+        <div>
+            {{ follow.followed_user.username }}
+            <a href="{% url 'unfollow_user' follow.followed_user.username %}">Ne plus suivre</a>
+            <a href="{% url 'block_user' follow.followed_user.username %}">Bloquer</a>
+        </div>
+    {% endfor %}
+
+    <h3>Utilisateurs bloqués</h3>
+    {% for block in blocked_users %}
+        <div>
+            {{ block.followed_user.username }}
+            <a href="{% url 'unblock_user' block.followed_user.username %}">Débloquer</a>
+        </div>
     {% endfor %}
 {% endblock content %}

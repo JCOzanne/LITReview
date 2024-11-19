@@ -1,19 +1,45 @@
-from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 from . import forms, models
-from .forms import TicketForm
 from .models import Ticket
+
+User = get_user_model()
 
 
 @login_required
 def home(request):
-    reviews=models.Review.objects.all()
-    tickets=models.Ticket.objects.all()
-    return render(request, 'blog/home.html', context={'reviews':reviews, 'tickets':tickets})
+    # Récupérer les utilisateurs suivis
+    followed_users = models.UserFollows.objects.filter(
+        user=request.user,
+        is_blocked=False
+    ).values_list('followed_user', flat=True)
+
+    # Inclure l'utilisateur connecté
+    users_to_show = list(followed_users) + [request.user.id]
+
+    # Récupérer les tickets
+    tickets = models.Ticket.objects.filter(
+        Q(user__in=users_to_show)
+    ).order_by('-time_created')
+
+    # Récupérer les critiques
+    reviews = models.Review.objects.filter(
+        Q(user__in=users_to_show) |
+        Q(ticket__user=request.user)
+    ).order_by('-time_created')
+
+    # Combiner et trier les tickets et reviews
+    combined_posts = list(tickets) + list(reviews)
+    combined_posts.sort(key=lambda x: x.time_created, reverse=True)
+
+    return render(request, 'blog/home.html', {
+        'posts': combined_posts
+    })
 
 
 @login_required
@@ -71,30 +97,6 @@ def create_ticket(request):
             ticket.save()
             return redirect('home')
     return render(request, 'blog/create_ticket.html', context={'form': form})
-
-
-@login_required
-def follow_users(request):
-    form = forms.FollowUserForm()
-    followed_users = models.UserFollows.objects.filter(user=request.user)
-
-    if request.method == 'POST':
-        form = forms.FollowUserForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['follows']
-            try:
-                user_to_follow = get_object_or_404(User, username=username)
-                if user_to_follow != request.user:
-                    models.UserFollows.objects.get_or_create(
-                        user=request.user,
-                        followed_user=user_to_follow
-                    )
-            except Http404:
-                messages.error(request, "Utilisateur non trouvé")
-
-    return render(request, 'blog/follow_users.html',
-                  {'form': form, 'followed_users': followed_users})
-
 
 @login_required
 def edit_ticket(request, ticket_id):
@@ -160,3 +162,100 @@ def delete_review(request, review_id):
         return redirect('home')
 
     return render(request, 'blog/delete_review.html', {'review': review})
+
+
+@login_required
+def follow_users(request):
+    followed = models.UserFollows.objects.filter(
+        user=request.user,
+        is_blocked=False
+    )
+
+    blocked = models.UserFollows.objects.filter(
+        user=request.user,
+        is_blocked=True
+    )
+
+    if request.method == 'POST':
+        form = forms.FollowUserForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            try:
+                user_to_follow = User.objects.get(username=username)
+
+                if user_to_follow == request.user:
+                    messages.error(request, "Vous ne pouvez pas vous suivre vous-même")
+                    return redirect('follow_users')
+
+                existing_follow, created = models.UserFollows.objects.get_or_create(
+                    user=request.user,
+                    followed_user=user_to_follow
+                )
+
+                if created:
+                    messages.success(request, f"Vous suivez maintenant {username}")
+                else:
+                    messages.info(request, f"Vous suivez déjà {username}")
+
+            except User.DoesNotExist:
+                messages.error(request, "Utilisateur non trouvé")
+
+    else:
+        form = forms.FollowUserForm()
+
+    return render(request, 'blog/follow_users.html', {
+        'form': form,
+        'followed_users': followed,
+        'blocked_users': blocked
+    })
+
+
+@login_required
+def unfollow_user(request, username):
+    try:
+        user_to_unfollow = User.objects.get(username=username)
+        follow_relation = models.UserFollows.objects.filter(
+            user=request.user,
+            followed_user=user_to_unfollow
+        )
+        follow_relation.delete()
+        messages.success(request, f"Vous ne suivez plus {username}")
+    except User.DoesNotExist:
+        messages.error(request, "Utilisateur non trouvé")
+
+    return redirect('follow_users')
+
+
+@login_required
+def block_user(request, username):
+    try:
+        user_to_block = User.objects.get(username=username)
+        follow_relation, created = models.UserFollows.objects.get_or_create(
+            user=request.user,
+            followed_user=user_to_block
+        )
+        follow_relation.is_blocked = True
+        follow_relation.save()
+        messages.success(request, f"{username} a été bloqué")
+    except User.DoesNotExist:
+        messages.error(request, "Utilisateur non trouvé")
+
+    return redirect('follow_users')
+
+
+@login_required
+def unblock_user(request, username):
+    try:
+        user_to_unblock = User.objects.get(username=username)
+        follow_relation = models.UserFollows.objects.get(
+            user=request.user,
+            followed_user=user_to_unblock,
+            is_blocked=True
+        )
+        follow_relation.is_blocked = False
+        follow_relation.save()
+        messages.success(request, f"{username} a été débloqué")
+    except User.DoesNotExist:
+        messages.error(request, "Utilisateur non trouvé")
+
+    return redirect('follow_users')
