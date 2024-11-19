@@ -8,12 +8,20 @@
     <h2>Critiques</h2>
     {% for review in reviews %}
         <h4>{{ review.headline }}</h4>
+        {% if review.user == user %}
+            <a href="{% url 'edit_review' review.id %}">Modifier</a>
+            <a href="{% url 'delete_review' review.id %}">Supprimer</a>
+        {% endif %}
     {% endfor %}
 
     <h2>Billets</h2>
     {% for ticket in tickets %}
         <h4>{{ ticket.title }}
             <a href="{% url 'create_review' ticket.id %}">Créer une critique</a>
+            {% if ticket.user == user %}
+                <a href="{% url 'edit_ticket' ticket.id %}">Modifier</a>
+                <a href="{% url 'delete_ticket' ticket.id %}">Supprimer</a>
+            {% endif %}
         </h4>
     {% endfor %}
 {% endblock content %}
