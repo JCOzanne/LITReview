@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <a href="{% url 'create_ticket' %}">Demander une critique</a>
+        <a href="{% url 'create_review_and_ticket' %}">Créer une critique</a>
+    </div>
+
+    <h2>Critiques</h2>
+    {% for review in reviews %}
+        <h4>{{ review.headline }}</h4>
+    {% endfor %}
+
+    <h2>Billets</h2>
+    {% for ticket in tickets %}
+        <h4>{{ ticket.title }}
+            <a href="{% url 'create_review' ticket.id %}">Créer une critique</a>
+        </h4>
+    {% endfor %}
+{% endblock content %}
