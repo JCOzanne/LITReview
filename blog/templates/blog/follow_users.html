@@ -18,7 +18,7 @@
         <span class="error-message">{{ form.username.errors.0 }}</span>
     {% endif %}
 </div>
-        <button type="submit">Suivre</button>
+        <button type="submit" class="btn btn-success">Suivre</button>
     </form>
 
 <div>
@@ -28,11 +28,11 @@
             {{ follow.followed_user.username }}
             <form method="post" action="{% url 'unfollow_user' follow.followed_user.username %}">
                 {% csrf_token %}
-                <button class="button">Ne plus suivre</button>
+                <button type="submit" class="btn btn-success">Ne plus suivre</button>
             </form>
             <form method="post" action="{% url 'block_user' follow.followed_user.username %}">
                 {% csrf_token %}
-                <button class="button">Bloquer</button>
+                <button type="submit" class="btn btn-success">Bloquer</button>
             </form>
         </div>
     {% endfor %}

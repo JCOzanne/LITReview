@@ -1,5 +1,5 @@
 {% load static %}
-<html>
+<html lang="fr">
     <head>
         <title>LITRevu</title>
         <link rel="stylesheet" href="{% static 'authentication/styles.css' %}">
@@ -11,7 +11,7 @@
                 <img src="{% static 'images/LITRevu_logo.PNG' %}" alt="LITRevu Logo">
             </div>
             {% if user.is_authenticated %}
-            <nav>
+            <nav aria-label="Navigation principale">
                 <ul class="nav-links">
                     <li><a href="{% url 'home' %}">Flux</a></li>
                     <li><a href="{% url 'create_ticket' %}">Demander une critique</a></li>
@@ -19,7 +19,7 @@
                     <li><a href="{% url 'my_tickets' %}">Mes Billets</a></li>
                     <li><a href="{% url 'my_reviews' %}">Mes Critiques</a></li>
                     <li><a href="{% url 'follow_users' %}">Gérer mes abonnements</a></li>
-                    <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+                    <li><a href="{% url 'logout' %}">{{user.username}} Se déconnecter</a></li>
                 </ul>
             </nav>
             {% endif %}

@@ -13,27 +13,22 @@ User = get_user_model()
 
 @login_required
 def home(request):
-    # Utilisateurs suivis par l'utilisateur connecté
     followed_users = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=False
     ).values_list('followed_user', flat=True)
 
-    # Billets (Tickets) : Inclut tous les utilisateurs
     tickets = models.Ticket.objects.all().order_by('-time_created')
 
-    # Critiques (Reviews) : Inclut celles créées par l'utilisateur connecté ou liées à ses billets
     reviews = models.Review.objects.filter(
         Q(user=request.user) |
         Q(ticket__user=request.user) |
         Q(user__in=followed_users)
     ).order_by('-time_created')
 
-    # Ajouter un indicateur aux billets pour savoir s'ils proviennent d'un utilisateur suivi
     for ticket in tickets:
         ticket.is_followed = ticket.user.id in followed_users
 
-    # Mélanger les billets et critiques dans un flux unique, trié par date
     combined_posts = sorted(
         list(tickets) + list(reviews),
         key=lambda x: x.time_created,
@@ -51,7 +46,6 @@ def home(request):
 def create_review(request, ticket_id):
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
 
-    # Vérifiez que l'utilisateur est connecté (aucune autre restriction liée au suivi)
     form = forms.ReviewForm()
 
     if request.method == 'POST':
