@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Mes Critiques</h2>
+    {% for review in reviews %}
+        <div class="review-container">
+            <h3>{{ review.headline }}</h3>
+            <p>Note : {{ review.rating }}/5</p>
+            <p>{{ review.body }}</p>
+            <p>Billet associé : {{ review.ticket.title }}</p>
+            <div class="review-actions">
+                <a href="{% url 'edit_review' review.id %}" class="btn btn-edit">Modifier</a>
+                <a href="{% url 'delete_review' review.id %}" class="btn btn-delete">Supprimer</a>
+            </div>
+            <small>Créé le {{ review.time_created }}</small>
+        </div>
+    {% empty %}
+        <p>Vous n'avez pas encore créé de critiques.</p>
+    {% endfor %}
+{% endblock %}

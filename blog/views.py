@@ -13,38 +13,45 @@ User = get_user_model()
 
 @login_required
 def home(request):
-    # Récupérer les utilisateurs suivis
+    # Utilisateurs suivis par l'utilisateur connecté
     followed_users = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=False
     ).values_list('followed_user', flat=True)
 
-    # Inclure l'utilisateur connecté
-    users_to_show = list(followed_users) + [request.user.id]
+    # Billets (Tickets) : Inclut tous les utilisateurs
+    tickets = models.Ticket.objects.all().order_by('-time_created')
 
-    # Récupérer les tickets
-    tickets = models.Ticket.objects.filter(
-        Q(user__in=users_to_show)
-    ).order_by('-time_created')
-
-    # Récupérer les critiques
+    # Critiques (Reviews) : Inclut celles créées par l'utilisateur connecté ou liées à ses billets
     reviews = models.Review.objects.filter(
-        Q(user__in=users_to_show) |
-        Q(ticket__user=request.user)
+        Q(user=request.user) |
+        Q(ticket__user=request.user) |
+        Q(user__in=followed_users)
     ).order_by('-time_created')
 
-    # Combiner et trier les tickets et reviews
-    combined_posts = list(tickets) + list(reviews)
-    combined_posts.sort(key=lambda x: x.time_created, reverse=True)
+    # Ajouter un indicateur aux billets pour savoir s'ils proviennent d'un utilisateur suivi
+    for ticket in tickets:
+        ticket.is_followed = ticket.user.id in followed_users
+
+    # Mélanger les billets et critiques dans un flux unique, trié par date
+    combined_posts = sorted(
+        list(tickets) + list(reviews),
+        key=lambda x: x.time_created,
+        reverse=True
+    )
 
     return render(request, 'blog/home.html', {
-        'posts': combined_posts
+        'posts': combined_posts,
+        'tickets': tickets,  # Optionnel, si nécessaire pour un affichage distinct
+        'reviews': reviews,  # Optionnel, si nécessaire pour un affichage distinct
     })
 
 
 @login_required
 def create_review(request, ticket_id):
-    ticket = get_object_or_404(Ticket, id=ticket_id)
+    ticket = get_object_or_404(models.Ticket, id=ticket_id)
+
+    # Vérifiez que l'utilisateur est connecté (aucune autre restriction liée au suivi)
     form = forms.ReviewForm()
 
     if request.method == 'POST':
@@ -54,10 +61,10 @@ def create_review(request, ticket_id):
             review.ticket = ticket
             review.user = request.user
             review.save()
+            messages.success(request, "Critique créée avec succès.")
             return redirect('home')
 
-    return render(request, 'blog/create_review.html',
-                  context={'form': form, 'ticket': ticket})
+    return render(request, 'blog/create_review.html', context={'form': form, 'ticket': ticket})
 
 
 @login_required
@@ -99,6 +106,11 @@ def create_ticket(request):
     return render(request, 'blog/create_ticket.html', context={'form': form})
 
 @login_required
+def my_tickets(request):
+    tickets = models.Ticket.objects.filter(user=request.user).order_by('-time_created')
+    return render(request, 'blog/my_tickets.html', {'tickets': tickets})
+
+@login_required
 def edit_ticket(request, ticket_id):
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
 
@@ -129,6 +141,11 @@ def delete_ticket(request, ticket_id):
         return redirect('home')
 
     return render(request, 'blog/delete_ticket.html', {'ticket': ticket})
+
+@login_required
+def my_reviews(request):
+    reviews = models.Review.objects.filter(user=request.user).order_by('-time_created')
+    return render(request, 'blog/my_reviews.html', {'reviews': reviews})
 
 @login_required
 def edit_review(request, review_id):

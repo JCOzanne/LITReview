@@ -1,12 +1,41 @@
+{% load static %}
 <html>
     <head>
         <title>LITRevu</title>
+        <link rel="stylesheet" href="{% static 'authentication/styles.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=EB+Garamond&display=swap" rel="stylesheet">
     </head>
     <body>
-        <h1>LITRevu</h1>
-        {% block content %}{% endblock content %}
-        {% if user.is_authenticated %}
-            <p>Vous êtes connecté en tant que {{ request.user }}. <a href="{% url 'logout' %}">Se déconnecter</a></p>
-        {% endif %}
+        <header>
+            <div class="banner">
+                <img src="{% static 'images/LITRevu_logo.PNG' %}" alt="LITRevu Logo">
+            </div>
+            {% if user.is_authenticated %}
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">Flux</a></li>
+                    <li><a href="{% url 'create_ticket' %}">Demander une critique</a></li>
+                    <li><a href="{% url 'create_review_and_ticket' %}">Créer une critique</a></li>
+                    <li><a href="{% url 'my_tickets' %}">Mes Billets</a></li>
+                    <li><a href="{% url 'my_reviews' %}">Mes Critiques</a></li>
+                    <li><a href="{% url 'follow_users' %}">Gérer mes abonnements</a></li>
+                    <li><a href="{% url 'logout' %}">Se déconnecter</a></li>
+                </ul>
+            </nav>
+            {% endif %}
+        </header>
+        <main>
+            {% block content %}{% endblock content %}
+        </main>
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
     </body>
 </html>

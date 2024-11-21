@@ -1,9 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-    <form method="post">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <button type="submit" >Se connecter</button>
-    </form>
-    <p>Pas encore membre ? <a href="{% url 'signup' %}">Inscrivez-vous maintenant !</a></p>
+
+    <div class="login-form">
+        <h2>Déjà membre ? Connectez-vous !</h2>
+        {% if message %}
+        <div class="error-message">{{ message }}</div>
+    {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Se connecter</button>
+        </form>
+        <div class="signup-prompt">
+            <span>Pas encore membre ?</span>
+            <a href="{% url 'signup' %}" class="btn btn-success">Créer mon compte</a>
+        </div>
+    </div>
 {% endblock content %}

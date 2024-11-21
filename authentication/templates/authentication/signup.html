@@ -1,12 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="signup-form">
     <h2>Inscription</h2>
     {% if form.errors %}
         {{ form.errors }}
     {% endif %}
     <form method="post">
-        {{ form.as_p }}
         {% csrf_token %}
-        <button type="submit" >S’inscrire</button>
+        {{ form.username.label_tag }} {{ form.username }}
+        {{ form.password1.label_tag }} {{ form.password1 }}
+        <div class="password-help">
+            <ul>
+                <li>Minimum 8 caractères</li>
+                <li>Une majuscule</li>
+                <li>Une minuscule</li>
+                <li>Un chiffre</li>
+                <li>Un caractère spécial</li>
+                <li>Ne pas ressembler à vos informations personnelles</li>
+                <li>Ne pas être un mot de passe couramment utilisé</li>
+            </ul>
+        </div>
+        {{ form.password2.label_tag }} {{ form.password2 }}
+        <button type="submit">S'inscrire</button>
     </form>
+</div>
+
 {% endblock content %}

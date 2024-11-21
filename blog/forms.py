@@ -1,5 +1,8 @@
 from django import forms
+
+from authentication.models import User
 from . import models
+
 
 class ReviewForm(forms.ModelForm):
     class Meta:
@@ -23,3 +26,9 @@ class TicketForm(forms.ModelForm):
 
 class FollowUserForm(forms.Form):
     username = forms.CharField(label="Nom d'utilisateur à suivre", max_length=150)
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if not User.objects.filter(username=username).exists():
+            raise forms.ValidationError("! Cet utilisateur n'existe pas")
+        return username

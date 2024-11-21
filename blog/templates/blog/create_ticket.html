@@ -4,6 +4,7 @@
     <form method="post" enctype="multipart/form-data">
         {{ form.as_p }}
         {% csrf_token %}
-        <button type="submit">Créer</button>
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Annuler</a>
     </form>
 {% endblock content %}

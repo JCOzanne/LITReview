@@ -1,27 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <a href="{% url 'create_ticket' %}">Demander une critique</a>
-        <a href="{% url 'create_review_and_ticket' %}">Créer une critique</a>
-        <a href="{% url 'follow_users' %}">Gérer mes abonnements</a>
-    </div>
-
     <h2>Flux</h2>
     {% for post in posts %}
-        <div>
-            {% if post.headline %}  {# C'est une review #}
-                <h3>Critique par {{ post.user.username }}</h3>
-                <p>{{ post.headline }}</p>
-                <p>Note : {{ post.rating }}/5</p>
-                <p>Billet associé : {{ post.ticket.title }}</p>
-            {% else %}  {# C'est un ticket #}
-                <h3>Billet de {{ post.user.username }}</h3>
-                <p>{{ post.title }}</p>
-                {% if post.image %}
-                    <img src="{{ post.image.url }}" alt="{{ post.title }}">
-                {% endif %}
+        <div class="post-container">
+            {% if post.headline %}
+                <div class="post-title">
+                    <h3>Critique par {{ post.user.username }}</h3>
+                </div>
+                <div class="post-content">
+                    <p>{{ post.headline }}</p>
+                    <p>Note : {{ post.rating }}/5</p>
+                    <p>Billet associé : {{ post.ticket.title }}</p>
+                </div>
+            {% else %}
+                <div class="post-title">
+                    <h3>Billet de {{ post.user.username }}</h3>
+                </div>
+                <div class="post-content">
+                    <p>{{ post.title }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                    {% endif %}
+                </div>
             {% endif %}
-            <small>Posté le {{ post.time_created }}</small>
+            <div class="post-meta">
+                <small>Posté le {{ post.time_created }}</small>
+            </div>
+            <div class="post-actions">
+                {% if not post.headline %}
+                    <a href="{% url 'create_review' post.id %}" class="btn btn-respond">Répondre</a>
+                {% endif %}
+            </div>
+
         </div>
     {% endfor %}
+
 {% endblock content %}

@@ -4,7 +4,7 @@
     <p>Êtes-vous sûr de vouloir supprimer le ticket "{{ ticket.title }}" ?</p>
     <form method="post">
         {% csrf_token %}
-        <button type="submit">Confirmer la suppression</button>
+        <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+        <a href="{% url 'my_tickets' %}" class="btn btn-secondary">Annuler</a>
     </form>
-    <a href="{% url 'home' %}">Annuler</a>
 {% endblock content %}
