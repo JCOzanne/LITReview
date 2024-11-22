@@ -6,10 +6,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from . import forms, models
-from .models import Ticket
 
 User = get_user_model()
-
 
 @login_required
 def home(request):
@@ -35,12 +33,15 @@ def home(request):
         reverse=True
     )
 
+    for post in combined_posts:
+        if isinstance(post, models.Review):
+            post.is_response = post.ticket.user == request.user
+
     return render(request, 'blog/home.html', {
         'posts': combined_posts,
-        'tickets': tickets,  # Optionnel, si nécessaire pour un affichage distinct
-        'reviews': reviews,  # Optionnel, si nécessaire pour un affichage distinct
+        'tickets': tickets,
+        'reviews': reviews,
     })
-
 
 @login_required
 def create_review(request, ticket_id):
@@ -187,6 +188,11 @@ def follow_users(request):
         is_blocked=True
     )
 
+    followers = models.UserFollows.objects.filter(
+        followed_user=request.user,
+        is_blocked=False
+    )
+
     if request.method == 'POST':
         form = forms.FollowUserForm(request.POST)
         if form.is_valid():
@@ -217,7 +223,8 @@ def follow_users(request):
     return render(request, 'blog/follow_users.html', {
         'form': form,
         'followed_users': followed,
-        'blocked_users': blocked
+        'blocked_users': blocked,
+        'followers': followers
     })
 
 

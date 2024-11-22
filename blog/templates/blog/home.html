@@ -4,14 +4,25 @@
     {% for post in posts %}
         <div class="post-container">
             {% if post.headline %}
-                <div class="post-title">
-                    <h3>Critique par {{ post.user.username }}</h3>
-                </div>
-                <div class="post-content">
-                    <p>{{ post.headline }}</p>
-                    <p>Note : {{ post.rating }}/5</p>
-                    <p>Billet associé : {{ post.ticket.title }}</p>
-                </div>
+                {% if post.is_response %}
+                    <div class="post-title">
+                        <h3>{{ post.user.username }} vous a répondu sur :</h3>
+                    </div>
+                    <div class="post-content">
+                        <p>{{ post.ticket.title }}</p>
+                        <p>{{ post.body }}</p>
+                        <p>Note : {{ post.rating }}/5</p>
+                    </div>
+                {% else %}
+                    <div class="post-title">
+                        <h3>Critique par {{ post.user.username }}</h3>
+                    </div>
+                    <div class="post-content">
+                        <p>{{ post.headline }}</p>
+                        <p>Note : {{ post.rating }}/5</p>
+                        <p>Billet associé : {{ post.ticket.title }}</p>
+                    </div>
+                {% endif %}
             {% else %}
                 <div class="post-title">
                     <h3>Billet de {{ post.user.username }}</h3>
@@ -27,12 +38,10 @@
                 <small>Posté le {{ post.time_created }}</small>
             </div>
             <div class="post-actions">
-                {% if not post.headline %}
+                {% if not post.headline and post.user != request.user %}
                     <a href="{% url 'create_review' post.id %}" class="btn btn-respond">Répondre</a>
                 {% endif %}
             </div>
-
         </div>
     {% endfor %}
-
 {% endblock content %}

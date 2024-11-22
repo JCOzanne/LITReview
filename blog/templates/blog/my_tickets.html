@@ -2,7 +2,7 @@
 {% block content %}
     <h2>Mes Billets</h2>
     {% for ticket in tickets %}
-        <div class="ticket-container">
+        <div class="post-container">
             <h3>{{ ticket.title }}</h3>
             <p>{{ ticket.description }}</p>
             {% if ticket.image %}
