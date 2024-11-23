@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from itertools import chain
 
 from . import forms, models
 
@@ -17,21 +18,14 @@ def home(request):
     ).values_list('followed_user', flat=True)
 
     tickets = models.Ticket.objects.all().order_by('-time_created')
-
     reviews = models.Review.objects.filter(
         Q(user=request.user) |
         Q(ticket__user=request.user) |
         Q(user__in=followed_users)
     ).order_by('-time_created')
 
-    for ticket in tickets:
-        ticket.is_followed = ticket.user.id in followed_users
-
-    combined_posts = sorted(
-        list(tickets) + list(reviews),
-        key=lambda x: x.time_created,
-        reverse=True
-    )
+    combined_posts = chain(tickets, reviews)
+    combined_posts=sorted(combined_posts, key=lambda x: x.time_created, reverse=True)
 
     for post in combined_posts:
         if isinstance(post, models.Review):
@@ -39,8 +33,6 @@ def home(request):
 
     return render(request, 'blog/home.html', {
         'posts': combined_posts,
-        'tickets': tickets,
-        'reviews': reviews,
     })
 
 @login_required
@@ -86,7 +78,6 @@ def create_review_and_ticket(request):
     return render(request, 'blog/create_review_and_ticket.html',
                   context={'ticket_form': ticket_form,
                            'review_form': review_form})
-
 
 @login_required
 def create_ticket(request):

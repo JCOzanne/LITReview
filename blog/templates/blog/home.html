@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
+
 {% block content %}
     <h2>Flux</h2>
+
     {% for post in posts %}
         <div class="post-container">
-            {% if post.headline %}
+            {% if post|model_type == 'Review' %}
                 {% if post.is_response %}
                     <div class="post-title">
                         <h3>{{ post.user.username }} vous a répondu sur :</h3>
