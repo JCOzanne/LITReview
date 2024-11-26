@@ -290,3 +290,25 @@ header {
     font-size: 20px;
     margin-left: 1rem;
 }
+/* styles.css */
+
+.standalone-review {
+    border: 2px solid #000;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.standalone-review .post-title {
+    margin-bottom: 10px;
+}
+
+.standalone-review .post-content {
+    margin-bottom: 10px;
+}
+
+.standalone-review .ticket-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+}

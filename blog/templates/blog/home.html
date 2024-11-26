@@ -14,23 +14,44 @@
                     <div class="post-content">
                         <p>{{ post.ticket.title}}</p>
                         {% if post.ticket.image %}
-                        <img src="{{ post.ticket.image.url }}" alt="{{ post.title }}">
+                            <img src="{{ post.ticket.image.url }}" alt="{{ post.title }}">
                         {% endif %}
                         <p>{{ post.ticket.description}}</p>
                         <p><strong>Sa réponse :</strong></p>
-                        <p>{{ post.body }}</p>
+                        <p>Titre : {{post.headline}}</p>
+                        <p>Commentaires :{{ post.body }}</p>
                         <p>Note : {{ post.rating }}/5</p>
                     </div>
                 {% else %}
-                    <div class="post-title">
-                        <h3>Critique par {{ post.user.username }}</h3>
-                    </div>
-                    <div class="post-content">
-                        <p>{{ post.headline }}</p>
-                        <p>{{ post.body }}</p>
-                        <p>Note : {{ post.rating }}/5</p>
-                        <p>Billet associé : {{ post.ticket.title }}</p>
-                    </div>
+                    {% if post.is_standalone %}
+                        <div class="standalone-review">
+                            <div class="post-title">
+                                <h3>Critique par {{ post.user.username }}</h3>
+                            </div>
+                            <div class="post-content">
+                                <p>{{ post.headline }}</p>
+                                <p>{{ post.body }}</p>
+                                <p>Note : {{ post.rating }}/5</p>
+                                <div class="ticket-details">
+                                    <h4>Billet associé : {{ post.ticket.title }}</h4>
+                                    <p>{{ post.ticket.description }}</p>
+                                    {% if post.ticket.image %}
+                                        <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="post-title">
+                            <h3>Critique par {{ post.user.username }}</h3>
+                        </div>
+                        <div class="post-content">
+                            <p>{{ post.headline }}</p>
+                            <p>{{ post.body }}</p>
+                            <p>Note : {{ post.rating }}/5</p>
+                            <p>Billet associé : {{ post.ticket.title }}</p>
+                        </div>
+                    {% endif %}
                 {% endif %}
             {% else %}
                 <div class="post-title">

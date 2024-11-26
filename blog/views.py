@@ -1,10 +1,11 @@
+from itertools import chain
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from itertools import chain
+from django.db.models import F
 
 from . import forms, models
 
@@ -17,19 +18,27 @@ def home(request):
         is_blocked=False
     ).values_list('followed_user', flat=True)
 
-    tickets = models.Ticket.objects.all().order_by('-time_created')
+    tickets = models.Ticket.objects.filter(
+        Q(user=request.user) |
+        Q(user__in=followed_users)
+    ).order_by('-time_created')
+
     reviews = models.Review.objects.filter(
         Q(user=request.user) |
         Q(ticket__user=request.user) |
         Q(user__in=followed_users)
     ).order_by('-time_created')
 
+    standalone_ticket_ids = reviews.filter(ticket__user=F('user')).values_list('ticket_id', flat=True)
+    tickets = tickets.exclude(id__in=standalone_ticket_ids)
+
     combined_posts = chain(tickets, reviews)
-    combined_posts=sorted(combined_posts, key=lambda x: x.time_created, reverse=True)
+    combined_posts = sorted(combined_posts, key=lambda x: x.time_created, reverse=True)
 
     for post in combined_posts:
         if isinstance(post, models.Review):
             post.is_response = post.ticket.user == request.user and post.user != request.user
+            post.is_standalone = post.ticket.user == post.user
 
     return render(request, 'blog/home.html', {
         'posts': combined_posts,
@@ -172,17 +181,23 @@ def follow_users(request):
     followed = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=False
-    )
+    ).select_related('followed_user')
 
     blocked = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=True
-    )
+    ).select_related('followed_user')
+
+    # Récupérer les utilisateurs qui vous suivent, mais exclure les bloqués
+    blocked_users = models.UserFollows.objects.filter(
+        user=request.user,
+        is_blocked=True
+    ).values_list('followed_user', flat=True)  # Liste des IDs bloqués
 
     followers = models.UserFollows.objects.filter(
         followed_user=request.user,
-        is_blocked=False
-    )
+        is_blocked=False  # On s'assure que les relations bloquées ne soient pas incluses
+    ).exclude(user__in=blocked_users)  # Exclure les utilisateurs bloqués
 
     if request.method == 'POST':
         form = forms.FollowUserForm(request.POST)
@@ -215,8 +230,9 @@ def follow_users(request):
         'form': form,
         'followed_users': followed,
         'blocked_users': blocked,
-        'followers': followers
+        'followers': followers  # Liste correctement filtrée
     })
+
 
 
 @login_required
