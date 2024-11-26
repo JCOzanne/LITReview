@@ -29,7 +29,7 @@ def home(request):
 
     for post in combined_posts:
         if isinstance(post, models.Review):
-            post.is_response = post.ticket.user == request.user
+            post.is_response = post.ticket.user == request.user and post.user != request.user
 
     return render(request, 'blog/home.html', {
         'posts': combined_posts,
