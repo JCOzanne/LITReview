@@ -5,7 +5,7 @@
         <div class="post-container">
             <h3>{{ review.headline }}</h3>
             <p>Note : {{ review.rating }}/5</p>
-            <p>{{ review.body }}</p>
+            <p>Commentaires :{{ review.body }}</p>
             <p>Billet associé : {{ review.ticket.title }}</p>
             <div class="review-actions">
                 <a href="{% url 'edit_review' review.id %}" class="btn btn-edit">Modifier</a>

@@ -5,16 +5,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.db.models import F
 
 from . import forms, models
 
-User = get_user_model()
 
 @login_required
-def home(request : HttpRequest) -> HttpResponse:
+def home(request:HttpRequest) -> HttpResponse:
     """
     Display the home feed with tickets and reviews from followed users.
     :param request: HTTP request object.
@@ -51,8 +49,9 @@ def home(request : HttpRequest) -> HttpResponse:
         'posts': combined_posts,
     })
 
+
 @login_required
-def create_review(request : HttpRequest, ticket_id : int) -> HttpResponse:
+def create_review(request:HttpRequest, ticket_id : int) -> HttpResponse:
     """
     Create a review in response to an existing ticket.
     :param request: HTTP request object.
@@ -106,6 +105,7 @@ def create_review_and_ticket(request):
                   context={'ticket_form': ticket_form,
                            'review_form': review_form})
 
+
 @login_required
 def create_ticket(request):
     """
@@ -123,6 +123,7 @@ def create_ticket(request):
             return redirect('home')
     return render(request, 'blog/create_ticket.html', context={'form': form})
 
+
 @login_required
 def my_tickets(request):
     """
@@ -132,6 +133,7 @@ def my_tickets(request):
     """
     tickets = models.Ticket.objects.filter(user=request.user).order_by('-time_created')
     return render(request, 'blog/my_tickets.html', {'tickets': tickets})
+
 
 @login_required
 def edit_ticket(request, ticket_id):
@@ -157,6 +159,7 @@ def edit_ticket(request, ticket_id):
 
     return render(request, 'blog/create_ticket.html', {'form': form})
 
+
 @login_required
 def delete_ticket(request, ticket_id):
     """
@@ -177,6 +180,7 @@ def delete_ticket(request, ticket_id):
 
     return render(request, 'blog/delete_ticket.html', {'ticket': ticket})
 
+
 @login_required
 def my_reviews(request):
     """
@@ -186,6 +190,7 @@ def my_reviews(request):
     """
     reviews = models.Review.objects.filter(user=request.user).order_by('-time_created')
     return render(request, 'blog/my_reviews.html', {'reviews': reviews})
+
 
 @login_required
 def edit_review(request, review_id):
@@ -291,13 +296,12 @@ def follow_users(request):
         'form': form,
         'followed_users': followed,
         'blocked_users': blocked,
-        'followers': followers  # Liste correctement filtrée
+        'followers': followers
     })
 
 
-
 @login_required
-def unfollow_user(request : HttpRequest, username : str) -> HttpResponse:
+def unfollow_user(request:HttpRequest, username : str) -> HttpResponse:
     """
     View to handle unfollowing a user.
     :param request: HTTP request object.

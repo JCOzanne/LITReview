@@ -5,6 +5,7 @@ from django.conf import settings
 
 from . import forms
 
+
 def login_page(request: HttpRequest) -> HttpResponse:
     """
     Handle user login.
@@ -27,7 +28,7 @@ def login_page(request: HttpRequest) -> HttpResponse:
     return render(request, 'authentication/login.html', context={'form': form, 'message': message})
 
 
-def logout_user(request : HttpRequest) -> HttpResponse:
+def logout_user(request:HttpRequest) -> HttpResponse:
     """
     Log out the current user.
     :param request:HTTP request object.
@@ -36,7 +37,8 @@ def logout_user(request : HttpRequest) -> HttpResponse:
     logout(request)
     return redirect('login')
 
-def signup_page(request : HttpRequest) -> HttpResponse:
+
+def signup_page(request:HttpRequest) -> HttpResponse:
     """
     Handle user registration.
     :param request: HTTP request object.

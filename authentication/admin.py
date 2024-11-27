@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
 from blog.models import Ticket, Review, UserFollows
 from .models import User

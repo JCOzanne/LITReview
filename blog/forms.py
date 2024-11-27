@@ -14,6 +14,7 @@ class ReviewForm(forms.ModelForm):
             'rating':'Note'
         }
 
+
 class TicketForm(forms.ModelForm):
     class Meta:
         model=models.Ticket
@@ -23,6 +24,7 @@ class TicketForm(forms.ModelForm):
             'description': 'Description',
             'image': 'Image'
         }
+
 
 class FollowUserForm(forms.Form):
     username = forms.CharField(label="Nom d'utilisateur à suivre", max_length=150)

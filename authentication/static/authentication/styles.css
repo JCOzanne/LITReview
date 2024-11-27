@@ -201,6 +201,7 @@ margin-left: 5rem;
 .form-field input[type="text"],
 .form-field textarea,
 .form-field select {
+    font-family: 'EB Garamond', serif;
     width: 50%;
     padding: 1rem;
     font-size: 18px;

@@ -3,8 +3,8 @@
     <h2>Mes Billets</h2>
     {% for ticket in tickets %}
         <div class="post-container">
-            <h3>{{ ticket.title }}</h3>
-            <p>{{ ticket.description }}</p>
+            <h3>Titre : {{ ticket.title }}</h3>
+            <p><strong>Description</strong> : <br>{{ ticket.description }}</p>
             {% if ticket.image %}
                 <img src="{{ ticket.image.url }}" alt="{{ ticket.title }}">
             {% endif %}
