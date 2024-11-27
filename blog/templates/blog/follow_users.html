@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 {% if messages %}
@@ -24,21 +23,21 @@
     </form>
 
     <div>
-        <h2>Abonnements</h2>
-        {% for follow in followed_users %}
-            <div class="follow-item">
-                <span class="username">{{ follow.followed_user.username }}</span>
-                <form method="post" action="{% url 'unfollow_user' follow.followed_user.username %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Ne plus suivre</button>
-                </form>
-            </div>
-        {% endfor %}
+    <h2>Abonnements</h2>
+    {% for follow in followed_users %}
+        <div class="follow-user-form">
+            <span class="username">{{ follow.followed_user.username }}</span>
+            <form method="post" action="{% url 'unfollow_user' follow.followed_user.username %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Ne plus suivre</button>
+            </form>
+        </div>
+    {% endfor %}
     </div>
 
     <h2>Abonné.es</h2>
     {% for follower in followers %}
-        <div class="follow-item">
+        <div class="follow-user-form">
             <span class="username">{{ follower.user.username }}</span>
             <form method="post" action="{% url 'block_user' follower.user.username %}">
                 {% csrf_token %}
@@ -49,7 +48,7 @@
 
     <h2>Utilisateurs bloqués</h2>
     {% for block in blocked_users %}
-        <div class="follow-item">
+        <div class="follow-user-form">
             <span class="username">{{ block.followed_user.username }}</span>
             <a href="{% url 'unblock_user' block.followed_user.username %}" class="btn btn-success">Débloquer</a>
         </div>

@@ -1,4 +1,6 @@
 from itertools import chain
+
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -12,7 +14,12 @@ from . import forms, models
 User = get_user_model()
 
 @login_required
-def home(request):
+def home(request : HttpRequest) -> HttpResponse:
+    """
+    Display the home feed with tickets and reviews from followed users.
+    :param request: HTTP request object.
+    :return: HTTP response rendering the home page 'home.html' with combined posts.
+    """
     followed_users = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=False
@@ -45,7 +52,13 @@ def home(request):
     })
 
 @login_required
-def create_review(request, ticket_id):
+def create_review(request : HttpRequest, ticket_id : int) -> HttpResponse:
+    """
+    Create a review in response to an existing ticket.
+    :param request: HTTP request object.
+    :param ticket_id: ID of the ticket being reviewed.
+    :return: HTTP response rendering the review creation page 'create_review.html'.
+    """
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
 
     form = forms.ReviewForm()
@@ -65,6 +78,11 @@ def create_review(request, ticket_id):
 
 @login_required
 def create_review_and_ticket(request):
+    """
+    Simultaneously create a ticket and a review.
+    :param request: HTTP request object.
+    :return: HTTP response rendering the combined creation page 'create_review_and_ticket.html'.
+    """
     ticket_form = forms.TicketForm()
     review_form = forms.ReviewForm()
 
@@ -90,6 +108,11 @@ def create_review_and_ticket(request):
 
 @login_required
 def create_ticket(request):
+    """
+    Create a ticket
+    :param request: HTTP request object.
+    :return: HTTP response rendering the ticket creation page 'create_ticket.html'.
+    """
     form = forms.TicketForm()
     if request.method == 'POST':
         form = forms.TicketForm(request.POST, request.FILES)
@@ -102,11 +125,22 @@ def create_ticket(request):
 
 @login_required
 def my_tickets(request):
+    """
+    Display the tickets created by the currently logged-in user.
+    :param request: HTTP request object.
+    :return: HTTP response rendering the ticket page 'my_ticket.html'.
+    """
     tickets = models.Ticket.objects.filter(user=request.user).order_by('-time_created')
     return render(request, 'blog/my_tickets.html', {'tickets': tickets})
 
 @login_required
 def edit_ticket(request, ticket_id):
+    """
+    View to handle the editing of an existing ticket.
+    :param request: HTTP request object.
+    :param ticket_id: The ID of the ticket to be edited.
+    :return: HTTP response rendering the  edit ticket page 'edit_ticket.html'.
+    """
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
 
     if request.user != ticket.user:
@@ -125,6 +159,12 @@ def edit_ticket(request, ticket_id):
 
 @login_required
 def delete_ticket(request, ticket_id):
+    """
+    View to handle the deletion of an existing ticket.
+    :param request: HTTP request object.
+    :param ticket_id: The ID of the ticket to be deleted.
+    :return: HTTP response rendering the  delete ticket page 'delete_ticket.html' with confirmation.
+    """
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
 
     if request.user != ticket.user:
@@ -139,11 +179,22 @@ def delete_ticket(request, ticket_id):
 
 @login_required
 def my_reviews(request):
+    """
+    Display the reviews created by the currently logged-in user.
+    :param request: HTTP request object.
+    :return: HTTP response rendering the review page 'my_review.html'.
+    """
     reviews = models.Review.objects.filter(user=request.user).order_by('-time_created')
     return render(request, 'blog/my_reviews.html', {'reviews': reviews})
 
 @login_required
 def edit_review(request, review_id):
+    """
+    View to handle the editing of an existing review.
+    :param request: HTTP request object.
+    :param review_id: The ID of the review to be edited.
+    :return: HTTP response rendering the  edit review page 'edit_review.html'.
+    """
     review = get_object_or_404(models.Review, id=review_id)
 
     if request.user != review.user:
@@ -163,6 +214,12 @@ def edit_review(request, review_id):
 
 @login_required
 def delete_review(request, review_id):
+    """
+    View to handle the deletion of an existing review.
+    :param request: HTTP request object.
+    :param review_id: The ID of the review to be deleted.
+    :return: HTTP response rendering the delete review page 'delete_review.html' with confirmation.
+    """
     review = get_object_or_404(models.Review, id=review_id)
 
     if request.user != review.user:
@@ -178,6 +235,11 @@ def delete_review(request, review_id):
 
 @login_required
 def follow_users(request):
+    """
+    View to manage the functionality of following, blocking, and displaying users.
+    :param request: HTTP request object.
+    :return: HTTP response rendering the followers, followed and blocked users page 'follow_users.html'
+    """
     followed = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=False
@@ -188,16 +250,15 @@ def follow_users(request):
         is_blocked=True
     ).select_related('followed_user')
 
-    # Récupérer les utilisateurs qui vous suivent, mais exclure les bloqués
     blocked_users = models.UserFollows.objects.filter(
         user=request.user,
         is_blocked=True
-    ).values_list('followed_user', flat=True)  # Liste des IDs bloqués
+    ).values_list('followed_user', flat=True)
 
     followers = models.UserFollows.objects.filter(
         followed_user=request.user,
-        is_blocked=False  # On s'assure que les relations bloquées ne soient pas incluses
-    ).exclude(user__in=blocked_users)  # Exclure les utilisateurs bloqués
+        is_blocked=False
+    ).exclude(user__in=blocked_users)
 
     if request.method == 'POST':
         form = forms.FollowUserForm(request.POST)
@@ -236,7 +297,13 @@ def follow_users(request):
 
 
 @login_required
-def unfollow_user(request, username):
+def unfollow_user(request : HttpRequest, username : str) -> HttpResponse:
+    """
+    View to handle unfollowing a user.
+    :param request: HTTP request object.
+    :param username: The username of the user to unfollow.
+    :return: Redirects to the 'follow_users.html' view after unfollowing.
+    """
     try:
         user_to_unfollow = User.objects.get(username=username)
         follow_relation = models.UserFollows.objects.filter(
@@ -253,6 +320,12 @@ def unfollow_user(request, username):
 
 @login_required
 def block_user(request, username):
+    """
+    View to handle blocking a user.
+    :param request: HTTP request object.
+    :param username: The username of the user to block.
+    :return: Redirects to the 'follow_users.html' view after blocking.
+    """
     try:
         user_to_block = User.objects.get(username=username)
         follow_relation, created = models.UserFollows.objects.get_or_create(
@@ -270,6 +343,12 @@ def block_user(request, username):
 
 @login_required
 def unblock_user(request, username):
+    """
+    View to handle unblocking a user.
+    :param request: HTTP request object.
+    :param username: The username of the user to unblock.
+    :return: Redirects to the 'follow_users' view after unblocking.
+    """
     try:
         user_to_unblock = User.objects.get(username=username)
         follow_relation = models.UserFollows.objects.get(

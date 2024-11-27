@@ -1,10 +1,16 @@
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.conf import settings
 
 from . import forms
 
-def login_page(request):
+def login_page(request: HttpRequest) -> HttpResponse:
+    """
+    Handle user login.
+    :param request:HTTP request Object
+    :return: HTTP response rendering the login page with a form and message.
+    """
     form = forms.LoginForm()
     message = ''
     if request.method == 'POST':
@@ -21,11 +27,21 @@ def login_page(request):
     return render(request, 'authentication/login.html', context={'form': form, 'message': message})
 
 
-def logout_user(request):
+def logout_user(request : HttpRequest) -> HttpResponse:
+    """
+    Log out the current user.
+    :param request:HTTP request object.
+    :return: HTTP response redirecting to the login page.
+    """
     logout(request)
     return redirect('login')
 
-def signup_page(request):
+def signup_page(request : HttpRequest) -> HttpResponse:
+    """
+    Handle user registration.
+    :param request: HTTP request object.
+    :return: HTTP response rendering the signup page with a form.
+    """
     form = forms.SignupForm()
     if request.method == 'POST':
         form = forms.SignupForm(request.POST)
