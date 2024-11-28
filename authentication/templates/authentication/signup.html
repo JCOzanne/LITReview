@@ -3,26 +3,28 @@
 <div class="signup-form">
     <h2>Inscription</h2>
     {% if form.errors %}
-        {{ form.errors }}
+        <div class="error-message">{{ form.errors }}</div>
     {% endif %}
     <form method="post">
         {% csrf_token %}
-        {{ form.username.label_tag }} {{ form.username }}
-        {{ form.password1.label_tag }} {{ form.password1 }}
+        <div class="form-field">
+            {{ form.username.label_tag }} {{ form.username }}
+        </div>
+        <div class="form-field">
+            {{ form.password1.label_tag }} {{ form.password1 }}
+        </div>
+        <div class="form-field">
+            {{ form.password2.label_tag }} {{ form.password2 }}
+        </div>
         <div class="password-help">
             <ul>
                 <li>Minimum 8 caractères</li>
-                <li>Une majuscule</li>
-                <li>Une minuscule</li>
-                <li>Un chiffre</li>
-                <li>Un caractère spécial</li>
+                <li>Minimum une majuscule, une minuscule, un chiffre, un caractère spécial</li>
                 <li>Ne pas ressembler à vos informations personnelles</li>
                 <li>Ne pas être un mot de passe couramment utilisé</li>
             </ul>
         </div>
-        {{ form.password2.label_tag }} {{ form.password2 }}
-        <button type="submit">S'inscrire</button>
+        <button type="submit" class="btn btn-success">S'inscrire</button>
     </form>
 </div>
-
 {% endblock content %}

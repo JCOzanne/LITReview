@@ -70,7 +70,9 @@
             </div>
             <div class="post-actions">
                 {% if not post.headline and post.user != request.user %}
-                    <a href="{% url 'create_review' post.id %}" class="btn btn-respond">Répondre</a>
+                    {% if not post.review_set.exists %}
+                        <a href="{% url 'create_review' post.id %}" class="btn btn-respond">Répondre</a>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>

@@ -110,14 +110,21 @@ margin-left: 5rem;
     margin-bottom: 1rem;
     font-size: 20px;
 }
-
-.signup-prompt {
-    margin-top: 2rem;
-    text-align: center;
+.signup-form .helptext {
+    display: none;
 }
-
-.signup-prompt .button {
-    margin-left: 1rem;
+.signup-form {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+.signup-form input {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    font-size: 20px;
+    border: 1px solid black;
+    border-radius: 8px;
 }
 
 .password-help {
@@ -133,10 +140,6 @@ margin-left: 5rem;
 
 .password-help li {
     margin-bottom: 5px;
-}
-
-.signup-form .helptext {
-    display: none;
 }
 
 .post-container {
@@ -176,10 +179,11 @@ margin-left: 5rem;
 }
 
 .signup-form input {
-    width: 20%;
+    width: 50%;
     height: 50px;
     padding: 1rem;
     font-size: 20px;
+    margin-left : 20px
 }
 
 .error-message {

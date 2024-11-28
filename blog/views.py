@@ -60,6 +60,10 @@ def create_review(request:HttpRequest, ticket_id : int) -> HttpResponse:
     """
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
 
+    if models.Review.objects.filter(ticket=ticket).exists():
+        messages.error(request, "Ce ticket a déjà une réponse.")
+        return redirect('home')
+
     form = forms.ReviewForm()
 
     if request.method == 'POST':
