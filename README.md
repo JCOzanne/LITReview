@@ -55,7 +55,7 @@ LITReview/
 2. Créez et activez un environnement virtuel :
    ```bash
    python -m venv .venv
-   source .venv/bin/activate   # Sur Windows : .venv\Scripts\activate
+   source venv/bin/activate   # Sur Windows : venv\Scripts\activate
    ```
 
 3. Installez les dépendances :
@@ -82,10 +82,10 @@ Lorsque vous accédez à l'application, vous avez la possibilité de vous inscri
 Une fois identifié, vous pouvez :
 - Créer un billet avec son titre, sa description et une image en cliquant sur le lien 'demander une critique',
 - Créer une critique à partir de zéro avec un billet associé en cliquant sur le lien 'créer une critique',
-- Modifier ou supprimer son billet (ou sa critique) en cliquant sur le lien 'mes billets'(ou 'mes critiques')
-- Suivre/ne plus suivre ou bloquer/débloquer un utilisateur en cliquant sur le lien 'gérer mes abonnements'
+- Modifier ou supprimer son billet (ou sa critique) en cliquant sur le lien 'mes billets'(ou 'mes critiques'),
+- Suivre/ne plus suivre ou bloquer/débloquer un utilisateur en cliquant sur le lien 'gérer mes abonnements',
 - Voir votre flux avec vos billets, vos critiques et les demandes de critiques d'autres utilisateurs,
-- Répondre à une demande de critique d'un utilisateur en cliquant sur le bouton 'Répondre' d'une demande de critique (si la demande à déjà fait l'objet d'une réponse, le bouton disparaît)
+- Répondre à une demande de critique d'un utilisateur en cliquant sur le bouton 'Répondre' d'une demande de critique (si la demande à déjà fait l'objet d'une réponse, le bouton disparaît).
 
 ### Informations
 
@@ -105,4 +105,4 @@ Rapport obtenu avec la commande :
  ``` flake8 authentication blog webapp --format=html --htmldir=flake8-report  ```  
 Conformément au fichier de configuration .flake8
 
-![Rapport Flake8](authentication/static/images/Rapport Flake8.png)
+![Rapport Flake8](authentication/static/images/Rapport_Flake8.png)
