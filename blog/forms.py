@@ -6,19 +6,19 @@ from . import models
 
 class ReviewForm(forms.ModelForm):
     class Meta:
-        model=models.Review
-        fields=['headline', 'body', 'rating']
-        labels={
-            'headline':'Titre',
+        model = models.Review
+        fields = ['headline', 'body', 'rating']
+        labels = {
+            'headline': 'Titre',
             'body': 'Commentaires',
-            'rating':'Note'
+            'rating': 'Note'
         }
 
 
 class TicketForm(forms.ModelForm):
     class Meta:
-        model=models.Ticket
-        fields=['title', 'description', 'image']
+        model = models.Ticket
+        fields = ['title', 'description', 'image']
         labels = {
             'title': 'Titre',
             'description': 'Description',

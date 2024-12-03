@@ -1,5 +1,5 @@
 from itertools import chain
-
+from . import forms, models
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -9,11 +9,9 @@ from django.db.models import F
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from . import forms, models
-
 
 @login_required
-def home(request:HttpRequest) -> HttpResponse:
+def home(request: HttpRequest) -> HttpResponse:
     """
     Display the home feed with tickets and reviews from followed users.
     :param request: HTTP request object.
@@ -24,15 +22,24 @@ def home(request:HttpRequest) -> HttpResponse:
         is_blocked=False
     ).values_list('followed_user', flat=True)
 
+    blocked_users = models.UserFollows.objects.filter(
+        user=request.user,
+        is_blocked=True
+    ).values_list('followed_user', flat=True)
+
     tickets = models.Ticket.objects.filter(
         Q(user=request.user) |
         Q(user__in=followed_users)
+    ).exclude(
+        user__in=blocked_users
     ).order_by('-time_created')
 
     reviews = models.Review.objects.filter(
         Q(user=request.user) |
         Q(ticket__user=request.user) |
         Q(user__in=followed_users)
+    ).exclude(
+        user__in=blocked_users
     ).order_by('-time_created')
 
     standalone_ticket_ids = reviews.filter(ticket__user=F('user')).values_list('ticket_id', flat=True)
@@ -52,7 +59,7 @@ def home(request:HttpRequest) -> HttpResponse:
 
 
 @login_required
-def create_review(request:HttpRequest, ticket_id : int) -> HttpResponse:
+def create_review(request: HttpRequest, ticket_id: int) -> HttpResponse:
     """
     Create a review in response to an existing ticket.
     :param request: HTTP request object.
@@ -60,6 +67,10 @@ def create_review(request:HttpRequest, ticket_id : int) -> HttpResponse:
     :return: HTTP response rendering the review creation page 'create_review.html'.
     """
     ticket = get_object_or_404(models.Ticket, id=ticket_id)
+
+    if models.UserFollows.objects.filter(user=ticket.user, followed_user=request.user, is_blocked=True).exists():
+        messages.error(request, "Vous ne pouvez pas répondre à ce ticket car vous avez été bloqué par l'auteur.")
+        return redirect('home')
 
     if models.Review.objects.filter(ticket=ticket).exists():
         messages.error(request, "Ce ticket a déjà une réponse.")
@@ -302,7 +313,7 @@ def follow_users(request):
 
 
 @login_required
-def unfollow_user(request:HttpRequest, username : str) -> HttpResponse:
+def unfollow_user(request: HttpRequest, username: str) -> HttpResponse:
     """
     View to handle unfollowing a user.
     :param request: HTTP request object.
