@@ -4,9 +4,10 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models import F
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from . import forms, models
 
@@ -82,9 +83,7 @@ def create_review(request:HttpRequest, ticket_id : int) -> HttpResponse:
 @login_required
 def create_review_and_ticket(request):
     """
-    Simultaneously create a ticket and a review.
-    :param request: HTTP request object.
-    :return: HTTP response rendering the combined creation page 'create_review_and_ticket.html'.
+    Create a ticket with review-like fields, but save only the Ticket instance.
     """
     ticket_form = forms.TicketForm()
     review_form = forms.ReviewForm()
@@ -96,12 +95,10 @@ def create_review_and_ticket(request):
         if ticket_form.is_valid() and review_form.is_valid():
             ticket = ticket_form.save(commit=False)
             ticket.user = request.user
+            ticket.review_title = review_form.cleaned_data['headline']
+            ticket.review_comment = review_form.cleaned_data['body']
+            ticket.review_rating = review_form.cleaned_data['rating']
             ticket.save()
-
-            review = review_form.save(commit=False)
-            review.ticket = ticket
-            review.user = request.user
-            review.save()
 
             return redirect('home')
 

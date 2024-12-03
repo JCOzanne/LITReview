@@ -38,9 +38,11 @@ margin-left: 5rem;
     margin: 0;
     font-size: 20px;
 }
+
 .nav-links li {
     margin-left: 2rem;
 }
+
 .nav-links li:hover {
     background-color: rgba(255, 140, 0,0.3);
 }
@@ -110,9 +112,11 @@ margin-left: 5rem;
     margin-bottom: 1rem;
     font-size: 20px;
 }
+
 .signup-form .helptext {
     display: none;
 }
+
 .signup-form {
     max-width: 600px;
     margin: 2rem auto;
@@ -278,20 +282,24 @@ margin-left: 5rem;
     padding: 0.5rem 1rem;
     margin-left: 2rem;
 }
+
 }
 .follow-item .username {
     font-size: 22px;
     margin-bottom: 10px;
     margin-left: 2rem;
 }
+
 .follow-user-form label {
     font-size: 24px;
     margin-bottom: 10px;
 }
+
 .follow-user-form {
     margin: 0 auto;
     margin-left: 2rem;
 }
+
 .follow-user-form input {
     width: 50%;
     height: 50px;

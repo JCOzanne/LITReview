@@ -3,7 +3,6 @@
 
 {% block content %}
     <h2>Flux</h2>
-
     {% for post in posts %}
         <div class="post-container">
             {% if post|model_type == 'Review' %}
@@ -12,25 +11,24 @@
                         <h3>{{ post.user.username }} vous a répondu sur :</h3>
                     </div>
                     <div class="post-content">
-                        <p>{{ post.ticket.title}}</p>
+                        <p>{{ post.ticket.title }}</p>
                         {% if post.ticket.image %}
-                            <img src="{{ post.ticket.image.url }}" alt="{{ post.title }}">
+                            <img src="{{ post.ticket.image.url }}" alt="{{ post.ticket.title }}">
                         {% endif %}
-                        <p>{{ post.ticket.description}}</p>
+                        <p>{{ post.ticket.description }}</p>
                         <p><strong>Sa réponse :</strong></p>
-                        <p>Titre : {{post.headline}}</p>
-                        <p>Commentaires :{{ post.body }}</p>
+                        <p>Titre : {{ post.headline }}</p>
+                        <p>Commentaires : {{ post.body }}</p>
                         <p>Note : {{ post.rating }}/5</p>
                     </div>
                 {% else %}
-                    {% if post.is_standalone %}
-                        <div class="standalone-review">
-                            <div class="post-title">
-                                <h3>Critique par {{ post.user.username }}</h3>
-                            </div>
+                    <div class="standalone-review">
+                        <div class="post-title">
+                            <h3>Critique par {{ post.user.username }}</h3>
+                        </div>
                         <div class="post-content">
-                            <p>{{ post.headline }}</p>
-                            <p>{{ post.body }}</p>
+                            <p>Titre : {{ post.headline }}</p>
+                            <p>Commentaires : {{ post.body }}</p>
                             <p>Note : {{ post.rating }}/5</p>
                             <div class="ticket-details">
                                 <h4>Billet associé : {{ post.ticket.title }}</h4>
@@ -40,18 +38,7 @@
                                 {% endif %}
                             </div>
                         </div>
-                        </div>
-                    {% else %}
-                        <div class="post-title">
-                            <h3>Critique par {{ post.user.username }}</h3>
-                        </div>
-                        <div class="post-content">
-                            <p>{{ post.headline }}</p>
-                            <p>{{ post.body }}</p>
-                            <p>Note : {{ post.rating }}/5</p>
-                            <p>Billet associé : {{ post.ticket.title }}</p>
-                        </div>
-                    {% endif %}
+                    </div>
                 {% endif %}
             {% else %}
                 <div class="post-title">
@@ -62,6 +49,15 @@
                     <p>{{ post.description }}</p>
                     {% if post.image %}
                         <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                    {% endif %}
+
+                    {% if post.review_title %}
+                        <div class="embedded-review">
+                            <h4>Critique intégrée :</h4>
+                            <p>Titre : {{ post.review_title }}</p>
+                            <p>Commentaires : {{ post.review_comment }}</p>
+                            <p>Note : {{ post.review_rating }}/5</p>
+                        </div>
                     {% endif %}
                 </div>
             {% endif %}
