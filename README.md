@@ -105,4 +105,4 @@ Rapport obtenu avec la commande :
  ``` flake8 authentication blog webapp --format=html --htmldir=flake8-report  ```  
 Conformément au fichier de configuration .flake8
 
-![Rapport Flake8](authentication/static/images/Rapport_Flake8.png)
+![Rapport Flake8](https://github.com/JCOzanne/LITReview/blob/main/authentication/static/images/Rapport_Flake8.PNG?raw=True)
